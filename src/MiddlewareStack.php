@@ -6,7 +6,6 @@ namespace BrenoRoosevelt\Middleware;
 use BrenoRoosevelt\Middleware\Middlewares\CallableMiddleware;
 use BrenoRoosevelt\Middleware\Middlewares\ErrorMiddleware;
 use BrenoRoosevelt\Middleware\Middlewares\LazyMiddleware;
-use BrenoRoosevelt\Middleware\Middlewares\DummyMiddleware;
 use BrenoRoosevelt\Psr11\NullContainer;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
@@ -66,9 +65,13 @@ class MiddlewareStack implements MiddlewareInterface
         return $middleware->process($subject, new self($stack, $this->container));
     }
 
-    public static function run($subject, array $middlewares, ?ContainerInterface $container = null)
-    {
-        return (new self($middlewares, $container))($subject);
+    public static function run(
+        $subject,
+        array $middlewares,
+        ?ContainerInterface $container = null,
+        ?MiddlewareInterface $stackExhaustedStrategy = null
+    ) {
+        return (new self($middlewares, $container, $stackExhaustedStrategy))($subject);
     }
 
     private static function toMiddleware(
