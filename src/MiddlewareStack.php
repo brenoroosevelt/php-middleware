@@ -31,9 +31,10 @@ class MiddlewareStack implements MiddlewareInterface
             );
     }
 
-    public function setStackExhaustedStrategy(MiddlewareInterface $middleware)
+    public function setStackExhaustedStrategy(MiddlewareInterface $middleware): self
     {
         $this->stackExhaustedStrategy = $middleware;
+        return $this;
     }
 
     public function prepend(MiddlewareInterface|callable|string $middleware): self
@@ -62,7 +63,7 @@ class MiddlewareStack implements MiddlewareInterface
         $middleware = $stack[0] ?? $this->stackExhaustedStrategy;
         array_shift($stack);
 
-        return $middleware->process($subject, new self($stack, $this->container));
+        return $middleware->process($subject, new self($stack, $this->container, $this->stackExhaustedStrategy));
     }
 
     public static function run(
