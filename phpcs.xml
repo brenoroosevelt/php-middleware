@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ruleset name="League Route Attribute Provider">
+    <description>Coding standard</description>
+    <arg name="basepath" value="."/>
+    <rule ref="PSR1"/>
+    <rule ref="PSR2"/>
+</ruleset>
