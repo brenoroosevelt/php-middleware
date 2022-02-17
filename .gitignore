@@ -4,3 +4,4 @@ docs
 vendor
 *.cache
 composer.phar
+.idea
