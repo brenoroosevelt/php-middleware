@@ -14,7 +14,7 @@ use ReflectionException;
 
 class AttributesLoader implements LoaderInterface
 {
-    const PREFIX = 'attributes_handler_cache';
+    const CACHE_PREFIX = 'attributes_handler_cache';
 
     /** @var string[] */
     private array $directories;
@@ -78,7 +78,7 @@ class AttributesLoader implements LoaderInterface
         return sha1(
             sprintf(
                 '%s.%s.%s',
-                self::PREFIX,
+                self::CACHE_PREFIX,
                 $this->attribute,
                 json_encode($this->directories, flags: JSON_THROW_ON_ERROR)
             )
