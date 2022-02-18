@@ -51,7 +51,7 @@ class MiddlewareStack implements MiddlewareInterface
         return $this->__invoke($subject);
     }
 
-    public function __invoke($subject): mixed
+    public function __invoke(mixed $subject): mixed
     {
         $stack = $this->middlewares;
         if(! ($middleware = array_shift($stack))) {
@@ -59,11 +59,6 @@ class MiddlewareStack implements MiddlewareInterface
         }
 
         return $this->toMiddleware($middleware)->process($subject, new self($stack, $this->container));
-    }
-
-    public static function run($subject, array $middlewares, ?ContainerInterface $container = null): mixed
-    {
-        return (new self($middlewares, $container))($subject);
     }
 
     private function toMiddleware(MiddlewareInterface|callable|string $middleware): MiddlewareInterface
@@ -75,5 +70,16 @@ class MiddlewareStack implements MiddlewareInterface
         }
 
         return new LazyMiddleware($middleware, $this->container);
+    }
+
+    /**
+     * @param mixed $subject
+     * @param array<MiddlewareInterface|callable|string> $middlewares
+     * @param ContainerInterface|null $container
+     * @return mixed
+     */
+    public static function run(mixed $subject, array $middlewares, ?ContainerInterface $container = null): mixed
+    {
+        return (new self($middlewares, $container))($subject);
     }
 }
