@@ -5,4 +5,7 @@ namespace BrenoRoosevelt\Middleware\Tests\Fixture;
 
 class Command
 {
+    public function __construct(public mixed $value)
+    {
+    }
 }

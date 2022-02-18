@@ -19,7 +19,7 @@ class AttributesLoaderTest extends TestCase
         $cache = new Psr16Cache(new ArrayAdapter());
         $attributesLoader = new AttributesLoader(Handler::class, [__DIR__], $cache);
         $bus = new Bus([new DispatchToHandlers($attributesLoader)]);
-        $result = $bus->handle(new Command);
+        $result = $bus->handle(new Command(10));
         $this->assertEquals(10, $result);
         $this->assertNotEmpty($cache->get($attributesLoader->cacheKey()));
     }

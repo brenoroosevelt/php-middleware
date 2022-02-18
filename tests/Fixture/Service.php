@@ -8,8 +8,8 @@ use BrenoRoosevelt\Middleware\Handler\Attribute\Handler;
 class Service
 {
     #[Handler(Command::class)]
-    public function return10(): int
+    public function returnValue(Command $command): mixed
     {
-        return 10;
+        return $command->value;
     }
 }
