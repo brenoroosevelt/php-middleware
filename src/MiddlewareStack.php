@@ -20,20 +20,21 @@ class MiddlewareStack implements MiddlewareInterface
     final public function __construct(
         array $middlewares,
         ?ContainerInterface $container = null,
-        ?MiddlewareInterface $stackExhaustedStrategy = null
+        MiddlewareInterface|callable|string|null $stackExhaustedStrategy = null
     ) {
         $this->container = $container ?? new NullContainer;
         $this->middlewares = array_map(fn($m) => self::toMiddleware($m, $this->container), $middlewares);
         $this->stackExhaustedStrategy =
-            $stackExhaustedStrategy ??
-            new ErrorMiddleware(
-                new RuntimeException('Middleware stack exhausted, missing final response middleware')
-            );
+            null !== $stackExhaustedStrategy ?
+                self::toMiddleware($stackExhaustedStrategy, $this->container) :
+                new ErrorMiddleware(
+                    new RuntimeException('Middleware stack exhausted, missing final response middleware')
+                );
     }
 
-    public function setStackExhaustedStrategy(MiddlewareInterface $middleware): self
+    public function setStackExhaustedStrategy(MiddlewareInterface|callable|string $middleware): self
     {
-        $this->stackExhaustedStrategy = $middleware;
+        $this->stackExhaustedStrategy = self::toMiddleware($middleware, $this->container);
         return $this;
     }
 
