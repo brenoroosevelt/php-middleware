@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace BrenoRoosevelt\Middleware\Handler;
 
 use BrenoRoosevelt\Middleware\MiddlewareInterface;
+use BrenoRoosevelt\Psr11\CompositeContainer;
 use BrenoRoosevelt\Psr11\NullContainer;
+use BrenoRoosevelt\Psr11\StaticContainer;
 use Psr\Container\ContainerInterface;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionParameter;
 
 class DispatchToHandlers implements MiddlewareInterface
 {
@@ -71,24 +74,26 @@ class DispatchToHandlers implements MiddlewareInterface
             } elseif ($parameter->isOptional()) {
                 continue;
             } elseif ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
-                $typeHint = ltrim($type->getName(), '?');
-                if ($typeHint === 'self') {
-                    $typeHint = $parameter->getDeclaringClass()->getName();
-                }
-
-                if ($typeHint === get_class($subject)) {
-                    $args[$name] = $subject;
-                    continue;
-                }
-
-                if ($this->container->has($typeHint)) {
-                    $args[$name] = $this->container->get($typeHint);
-                } else {
-                    $args[$name] = new $typeHint;
-                }
+                $args[$name] = $this->resolveArgumentTypeHint($parameter, $subject);
             }
         }
 
         return $args;
+    }
+
+    private function resolveArgumentTypeHint(ReflectionParameter $parameter, $subject): mixed
+    {
+        $type = $parameter->getType();
+        $typeHint = ltrim($type->getName(), '?');
+        if ($typeHint === 'self') {
+            $typeHint = $parameter->getDeclaringClass()->getName();
+        }
+
+        $container = new CompositeContainer(
+            $this->container,
+            new StaticContainer([get_class($subject) => $subject])
+        );
+
+        return $container->has($typeHint) ? $container->get($typeHint) : new $typeHint;
     }
 }
