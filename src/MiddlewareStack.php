@@ -54,7 +54,7 @@ class MiddlewareStack implements MiddlewareInterface
     public function __invoke(mixed $subject): mixed
     {
         $stack = $this->middlewares;
-        if(! ($middleware = array_shift($stack))) {
+        if (! $middleware = array_shift($stack)) {
             throw MiddlewareStackExhausted::missingFinalHandler();
         }
 
