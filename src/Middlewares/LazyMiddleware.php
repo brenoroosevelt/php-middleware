@@ -11,10 +11,8 @@ class LazyMiddleware implements MiddlewareInterface
 {
     private ContainerInterface $container;
 
-    final public function __construct(
-        private string $middlewareFQCN,
-        ?ContainerInterface $container = null
-    ) {
+    public function __construct(private string $middlewareFQCN, ?ContainerInterface $container = null)
+    {
         $this->container = $container ?? new NullContainer;
     }
 
