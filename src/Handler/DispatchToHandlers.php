@@ -90,8 +90,8 @@ class DispatchToHandlers implements MiddlewareInterface
         }
 
         $container = new CompositeContainer(
+            new StaticContainer([get_class($subject) => $subject]),
             $this->container,
-            new StaticContainer([get_class($subject) => $subject])
         );
 
         return $container->has($typeHint) ? $container->get($typeHint) : new $typeHint;
