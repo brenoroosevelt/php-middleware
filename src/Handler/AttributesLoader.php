@@ -11,6 +11,9 @@ use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
+use ReflectionNamedType;
+use RuntimeException;
 
 class AttributesLoader implements LoaderInterface
 {
@@ -43,7 +46,7 @@ class AttributesLoader implements LoaderInterface
         }
 
         $finder = Fqcn::new();
-        array_map(fn($dir) => $finder->addDirectory($dir, true), $this->directories);
+        array_map(fn($dir) => $finder->addDirectory($dir), $this->directories);
         $handlers = $this->getHandlersFromClasses(...$finder->find());
         $this->cache?->set($cacheKey, $handlers);
 
@@ -52,6 +55,7 @@ class AttributesLoader implements LoaderInterface
 
     /**
      * @throws ReflectionException
+     * @return ParsedHandler[]
      */
     private function getHandlersFromClasses(string ...$classes): array
     {
@@ -62,12 +66,30 @@ class AttributesLoader implements LoaderInterface
                 foreach ($method->getAttributes($this->attribute, $this->attributeFlags) as $attribute) {
                     /** @var Handler $handler */
                     $handler = $attribute->newInstance();
-                    $handlers[] = new ParsedHandler($handler->subject(), $class, $method->getName());
+                    $subject = $handler->subject() ?? $this->getFirstObjectParameter($method);
+                    if (null === $subject) {
+                        throw new RuntimeException(
+                            sprintf('Invalid handler attribute for %s::%s', $class, $method->getName())
+                        );
+                    }
+
+                    $handlers[] = new ParsedHandler($subject, $class, $method->getName());
                 }
             }
         }
 
         return $handlers;
+    }
+
+    private function getFirstObjectParameter(ReflectionMethod $reflectionMethod): ?string
+    {
+        foreach ($reflectionMethod->getParameters() as $parameter) {
+            if ($parameter->getType() instanceof ReflectionNamedType && !$parameter->getType()->isBuiltin()) {
+                return $parameter->getType()->getName();
+            }
+        }
+
+        return null;
     }
 
     /**

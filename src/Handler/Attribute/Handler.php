@@ -8,11 +8,11 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD)]
 class Handler
 {
-    public function __construct(private string $subject)
+    public function __construct(private ?string $subject = null)
     {
     }
 
-    public function subject(): string
+    public function subject(): ?string
     {
         return $this->subject;
     }
