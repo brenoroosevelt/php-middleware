@@ -11,7 +11,7 @@ use Psr\Container\ContainerInterface;
 class MiddlewareStack implements MiddlewareInterface
 {
     /** @var array<MiddlewareInterface|callable|string> */
-    private array $middlewares;
+    private array $middlewares = [];
 
     private ContainerInterface $container;
 
