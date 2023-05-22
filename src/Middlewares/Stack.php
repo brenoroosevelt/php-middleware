@@ -33,7 +33,7 @@ class Stack
      */
     public function append(callable $handler): self
     {
-        return new self(...$this->handlers, $handler);
+        return new self(...[...$this->handlers, $handler]);
     }
 
     /**
@@ -42,7 +42,7 @@ class Stack
      */
     public function prepend(callable $handler): self
     {
-        return new self($handler, ...$this->handlers);
+        return new self(...[$handler, ...$this->handlers]);
     }
 
     /**
