@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BrenoRoosevelt\Middleware\Middlewares;
-
-use BrenoRoosevelt\Middleware\MiddlewareStackExhausted;
+namespace BrenoRoosevelt\Middleware;
 
 /**
  * @readonly
