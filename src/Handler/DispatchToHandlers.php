@@ -49,7 +49,7 @@ class DispatchToHandlers implements MiddlewareInterface
         return $fn($subject);
     }
 
-    protected function invokeMethod(ReflectionMethod $method, object $instance, array $args): mixed
+    protected function invokeMethod(ReflectionMethod $method, object|null $instance, array $args): mixed
     {
         return $method->invokeArgs($instance, $args);
     }
