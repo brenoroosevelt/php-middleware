@@ -40,13 +40,18 @@ class DispatchToHandlers implements MiddlewareInterface
             $method = new ReflectionMethod($handler->className(), $handler->methodName());
             $instance = $this->getInstance($method, $handler);
             $args = $this->resolveArguments($method, $subject);
-            $fn = static function ($subject) use ($fn, $method, $instance, $args) {
+            $fn = function ($subject) use ($fn, $method, $instance, $args) {
                 $fn($subject);
-                return $method->invokeArgs($instance, $args);
+                return $this->invokeMethod($method, $instance, $args);
             };
         }
 
         return $fn($subject);
+    }
+
+    protected function invokeMethod(ReflectionMethod $method, object $instance, array $args): mixed
+    {
+        return $method->invokeArgs($instance, $args);
     }
 
     protected function getInstance(ReflectionMethod $method, ParsedHandler $handler): mixed
