@@ -15,10 +15,10 @@ use ReflectionParameter;
 
 class DispatchToHandlers implements MiddlewareInterface
 {
-    private ContainerInterface $container;
+    protected ContainerInterface $container;
 
     public function __construct(
-        private LoaderInterface $loader,
+        protected LoaderInterface $loader,
         ?ContainerInterface $container = null
     ) {
         $this->container = $container ?? new NullContainer;
