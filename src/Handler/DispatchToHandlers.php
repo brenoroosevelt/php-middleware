@@ -49,7 +49,7 @@ class DispatchToHandlers implements MiddlewareInterface
         return $fn($subject);
     }
 
-    private function getInstance(ReflectionMethod $method, ParsedHandler $handler): mixed
+    protected function getInstance(ReflectionMethod $method, ParsedHandler $handler): mixed
     {
         if ($method->isStatic()) {
             return null;
@@ -61,7 +61,7 @@ class DispatchToHandlers implements MiddlewareInterface
                 new ($handler->className());
     }
 
-    private function resolveArguments(ReflectionMethod $method, $subject): array
+    protected function resolveArguments(ReflectionMethod $method, $subject): array
     {
         $args = [];
         foreach ($method->getParameters() as $parameter) {
@@ -81,7 +81,7 @@ class DispatchToHandlers implements MiddlewareInterface
         return $args;
     }
 
-    private function resolveArgumentTypeHint(ReflectionParameter $parameter, $subject): mixed
+    protected function resolveArgumentTypeHint(ReflectionParameter $parameter, $subject): mixed
     {
         $type = $parameter->getType();
         $typeHint = ltrim($type->getName(), '?');
