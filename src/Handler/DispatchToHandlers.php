@@ -5,9 +5,10 @@ namespace BrenoRoosevelt\Middleware\Handler;
 
 use BrenoRoosevelt\Middleware\MiddlewareInterface;
 use BrenoRoosevelt\Psr11\CompositeContainer;
-use BrenoRoosevelt\Psr11\NullContainer;
 use BrenoRoosevelt\Psr11\StaticContainer;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -15,13 +16,13 @@ use ReflectionParameter;
 
 class DispatchToHandlers implements MiddlewareInterface
 {
-    protected ContainerInterface $container;
+    protected ?ContainerInterface $container;
 
     public function __construct(
         protected LoaderInterface $loader,
         ?ContainerInterface $container = null
     ) {
-        $this->container = $container ?? new NullContainer;
+        $this->container = $container;
     }
 
     /**
@@ -54,6 +55,10 @@ class DispatchToHandlers implements MiddlewareInterface
         return $method->invokeArgs($instance, $args);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getInstance(ReflectionMethod $method, ParsedHandler $handler): mixed
     {
         if ($method->isStatic()) {
@@ -61,7 +66,7 @@ class DispatchToHandlers implements MiddlewareInterface
         }
 
         return
-            $this->container->has($handler->className()) ?
+            $this->container?->has($handler->className()) ?
                 $this->container->get($handler->className()) :
                 new ($handler->className());
     }
@@ -94,10 +99,8 @@ class DispatchToHandlers implements MiddlewareInterface
             $typeHint = $parameter->getDeclaringClass()->getName();
         }
 
-        $container = new CompositeContainer(
-            new StaticContainer([get_class($subject) => $subject]),
-            $this->container,
-        );
+        $stack = array_filter([new StaticContainer([get_class($subject) => $subject]), $this->container]);
+        $container = new CompositeContainer(...$stack);
 
         return $container->has($typeHint) ? $container->get($typeHint) : new $typeHint;
     }

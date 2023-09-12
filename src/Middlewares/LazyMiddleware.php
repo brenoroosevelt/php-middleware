@@ -4,16 +4,15 @@ declare(strict_types=1);
 namespace BrenoRoosevelt\Middleware\Middlewares;
 
 use BrenoRoosevelt\Middleware\MiddlewareInterface;
-use BrenoRoosevelt\Psr11\NullContainer;
 use Psr\Container\ContainerInterface;
 
 class LazyMiddleware implements MiddlewareInterface
 {
-    private ContainerInterface $container;
+    private ?ContainerInterface $container;
 
     public function __construct(private string $middlewareFQCN, ?ContainerInterface $container = null)
     {
-        $this->container = $container ?? new NullContainer;
+        $this->container = $container;
     }
 
     /** @inheritDoc */
@@ -24,7 +23,7 @@ class LazyMiddleware implements MiddlewareInterface
 
     private function getMiddleware(): MiddlewareInterface
     {
-        if ($this->container->has($this->middlewareFQCN)) {
+        if ($this->container?->has($this->middlewareFQCN)) {
             return $this->container->get($this->middlewareFQCN);
         }
 

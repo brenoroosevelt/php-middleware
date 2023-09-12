@@ -5,7 +5,6 @@ namespace BrenoRoosevelt\Middleware;
 
 use BrenoRoosevelt\Middleware\Middlewares\CallableMiddleware;
 use BrenoRoosevelt\Middleware\Middlewares\LazyMiddleware;
-use BrenoRoosevelt\Psr11\NullContainer;
 use Psr\Container\ContainerInterface;
 
 class MiddlewareStack implements MiddlewareInterface
@@ -13,7 +12,7 @@ class MiddlewareStack implements MiddlewareInterface
     /** @var array<MiddlewareInterface|callable|string> */
     private array $middlewares = [];
 
-    private ContainerInterface $container;
+    private ?ContainerInterface $container;
 
     /**
      * @param array<MiddlewareInterface|callable|string> $middlewares
@@ -21,7 +20,7 @@ class MiddlewareStack implements MiddlewareInterface
      */
     final public function __construct(array $middlewares, ?ContainerInterface $container = null)
     {
-        $this->container = $container ?? new NullContainer;
+        $this->container = $container;
         foreach ($middlewares as $middleware) {
             $this->append($middleware);
         }
